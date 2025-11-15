@@ -30,6 +30,21 @@ from tests.fixtures import (
 )
 
 
+def _to_json_serializable(obj):
+    """
+    Convert tuples to lists for JSON serialization compatibility.
+    pytest-pinned stores results as JSON, which converts tuples to lists.
+    """
+    if isinstance(obj, tuple):
+        return list(_to_json_serializable(item) for item in obj)
+    elif isinstance(obj, list):
+        return [_to_json_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: _to_json_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
+
+
 @pytest.mark.parametrize(
     "vessel_data,voyage_profile,scenario_name",
     [
@@ -131,7 +146,8 @@ def test_suggest_alternative_energy_systems_pinned(
     result = suggest_alternative_energy_systems(
         vessel_data, voyage_profile, REFERENCE_VALUES
     )
-    # Result is a tuple (gas_system, battery_system)
+    # Result is a tuple (gas_system, battery_system) - convert to list for JSON compatibility
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
@@ -165,6 +181,8 @@ def test_suggest_alternative_energy_systems_simple_pinned(
         voyage_length_nm,
         REFERENCE_VALUES,
     )
+    # Convert tuple result to list for JSON compatibility
+    result = _to_json_serializable(result)
     assert result == pinned
 
 

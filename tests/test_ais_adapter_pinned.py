@@ -10,6 +10,21 @@ from datetime import datetime
 from ceto.ais_adapter import guesstimate_vessel_data, guesstimate_voyage_data
 
 
+def _to_json_serializable(obj):
+    """
+    Convert tuples to lists for JSON serialization compatibility.
+    pytest-pinned stores results as JSON, which converts tuples to lists.
+    """
+    if isinstance(obj, tuple):
+        return list(_to_json_serializable(item) for item in obj)
+    elif isinstance(obj, list):
+        return [_to_json_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: _to_json_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
+
+
 @pytest.mark.parametrize(
     "ship_type,to_bow,to_stern,to_port,to_starboard,speed,draught,lat,lon,scenario_name",
     [
@@ -131,6 +146,8 @@ def test_guesstimate_voyage_data_pinned(
         design_speed,
         design_draft,
     )
+    # Convert tuples in legs_manoeuvring and legs_at_sea to lists for JSON compatibility
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
@@ -185,6 +202,7 @@ def test_guesstimate_voyage_data_stationary_vessel_pinned(pinned):
         design_speed=15,
         design_draft=7,
     )
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
@@ -207,4 +225,5 @@ def test_guesstimate_voyage_data_different_positions_zero_speed_pinned(pinned):
         design_speed=16,
         design_draft=8,
     )
+    result = _to_json_serializable(result)
     assert result == pinned

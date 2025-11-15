@@ -18,6 +18,21 @@ from ceto.energy_systems import (
 )
 
 
+def _to_json_serializable(obj):
+    """
+    Convert tuples to lists for JSON serialization compatibility.
+    pytest-pinned stores results as JSON, which converts tuples to lists.
+    """
+    if isinstance(obj, tuple):
+        return list(_to_json_serializable(item) for item in obj)
+    elif isinstance(obj, list):
+        return [_to_json_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: _to_json_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
+
+
 @pytest.mark.parametrize(
     "ship_type,to_bow,to_stern,to_port,to_starboard,speed,draught,lat,lon,scenario_name",
     [
@@ -144,6 +159,8 @@ def test_complete_ferry_workflow_pinned(pinned):
         "battery_system": battery_system,
     }
 
+    # Convert tuples to lists for JSON compatibility
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
