@@ -148,7 +148,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 - **Issues**: [GitHub Issues](https://github.com/RISE-Maritime/ceto/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/RISE-Maritime/ceto/discussions)
-- **Email**: luis.sanchez-heres@ri.se
 
 ## Acknowledgments
 
