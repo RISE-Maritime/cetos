@@ -5,7 +5,7 @@ NAME = "ceto"
 DESCRIPTION = "A Python package for analyzing vessel data."
 URL = "https://github.com/rise-mo/ceto"
 EMAIL = "luis.sanchez-heres@ri.se"
-AUTHOR = "Maritime Operations - RISE"
+AUTHOR = "Maritime Department - RISE"
 REQUIRES_PYTHON = ">=3.8.0"
 VERSION = "0.1.0"
 
