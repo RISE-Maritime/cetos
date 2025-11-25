@@ -137,3 +137,6 @@ uv.lock
 
 # setuptools-scm version file
 ceto/_version.py
+
+# Ruff
+.ruff-cache
