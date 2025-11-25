@@ -32,6 +32,7 @@ dev = [
     "black>=23.3.0",
     "pytest>=7.3.1",
     "ruff>=0.1.0",
+    "pytest-pinned>=0.4.2",
 ]
 
 [project.urls]
