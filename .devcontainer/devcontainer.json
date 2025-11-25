@@ -37,9 +37,5 @@
     }
   },
 
-  "remoteUser": "vscode",
-
-  "mounts": [
-    "source=${localWorkspaceFolder}/.venv,target=${containerWorkspaceFolder}/.venv,type=bind,consistency=cached"
-  ]
+  "remoteUser": "vscode"
 }
