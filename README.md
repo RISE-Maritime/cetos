@@ -1,3 +1,5 @@
+![cetos-logo](./cetos-logo.svg)
+
 # cetos
 
 [![CI](https://github.com/RISE-Maritime/cetos/workflows/CI%20checks/badge.svg)](https://github.com/RISE-Maritime/cetos/actions)
