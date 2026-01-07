@@ -9,6 +9,7 @@ from typing import Tuple
 
 import numpy as np
 
+from cetos.models import VesselData, VoyageLeg, VoyageProfile
 from cetos.utils import ms_to_knots
 
 
@@ -379,7 +380,7 @@ def guesstimate_vessel_data(
     draft: float,
     latitude: float,
     longitude: float,
-) -> dict:
+) -> VesselData:
     """Guesstimate vessel_data input to cetos using parameters readily avilable in AIS data
 
     Args:
@@ -398,7 +399,7 @@ def guesstimate_vessel_data(
         which they do if they are not deemed resonable for further guesstimations.
 
     Returns:
-        dict: Vessel data
+        VesselData: Vessel data instance
     """
     # Validation
     if not _validate_dimensions(dim_a, dim_b, dim_c, dim_d):
@@ -445,29 +446,20 @@ def guesstimate_vessel_data(
             imo_ship_type, vessel_size
         )
 
-    # Assemble output dictionary
-    vessel_data = {
-        # Fixed values that will not be inferred from AIS data but are reasonable static assumptions
-        **{
-            "double_ended": False,
-            "propulsion_engine_age": "after_2000",
-        },
-        # Guesstimated values
-        **{
-            "type": imo_ship_type,
-            "length": length,
-            "beam": beam,
-            "size": vessel_size,
-            "design_draft": design_draft,
-            "design_speed": design_speed,
-            "number_of_propulsion_engines": number_of_engines,
-            "propulsion_engine_power": engine_power,
-            "propulsion_engine_type": engine_type,
-            "propulsion_engine_fuel_type": engine_fuel_type,
-        },
-    }
-
-    return vessel_data
+    return VesselData(
+        length_m=length,
+        beam_m=beam,
+        design_speed_kn=design_speed,
+        design_draft_m=design_draft,
+        type=imo_ship_type,
+        size=vessel_size,
+        double_ended=False,
+        number_of_propulsion_engines=number_of_engines,
+        propulsion_engine_power_kw=engine_power,
+        propulsion_engine_type=engine_type,
+        propulsion_engine_age="after_2000",
+        propulsion_engine_fuel_type=engine_fuel_type,
+    )
 
 
 EARTH_RADIUS = 6367.0 * 1000.0
@@ -527,7 +519,7 @@ def guesstimate_voyage_data(
     time_2: datetime,
     design_speed: float,
     design_draft: float,
-) -> dict:
+) -> VoyageProfile:
     """Guesstimate voyage data input to cetos from parameters readily available in AIS messages
 
     Args:
@@ -545,7 +537,7 @@ def guesstimate_voyage_data(
         design_draft (float): Design draft of vessel [m]
 
     Returns:
-        dict: _description_
+        VoyageProfile: Voyage profile instance
     """
     _, distance = _rhumbline(latitude_1, longitude_1, latitude_2, longitude_2)
     distance /= 1852  # To nautical miles (nm)
@@ -568,26 +560,15 @@ def guesstimate_voyage_data(
         else design_draft
     )
 
-    default_output = {
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0,
-        "legs_manoeuvring": [],
-        "legs_at_sea": [],
-    }
-
     # Less than 3 knots -> at anchor or in port
     if avg_speed < 3.0:
-        return {**default_output, **{"time_anchored": delta_time}}
+        return VoyageProfile(time_anchored_h=delta_time)
 
     # Between 3 knots and half the design speed -> manoeuvring
     elif 3.0 <= avg_speed <= design_speed / 2:
-        return {
-            **default_output,
-            **{"legs_manoeuvring": [(distance, avg_speed, avg_draft)]},
-        }
+        return VoyageProfile(
+            legs_manoeuvring=[VoyageLeg(distance, avg_speed, avg_draft)]
+        )
 
     # else we are at sea
-    return {
-        **default_output,
-        **{"legs_at_sea": [(distance, avg_speed, avg_draft)]},
-    }
+    return VoyageProfile(legs_at_sea=[VoyageLeg(distance, avg_speed, avg_draft)])

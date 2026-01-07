@@ -1,126 +1,126 @@
 {
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_large_dimensions_pinned_1": {
-        "beam": 50,
-        "design_draft": 15,
-        "design_speed": 19.113255471894803,
+        "beam_m": 50,
+        "design_draft_m": 15,
+        "design_speed_kn": 19.113255471894803,
         "double_ended": false,
-        "length": 300,
+        "length_m": 300,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 19874.343602077697,
+        "propulsion_engine_power_kw": 19874.343602077697,
         "propulsion_engine_type": "SSD",
         "size": 149400.0,
         "type": "oil_tanker"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_minimum_dimensions_pinned_1": {
-        "beam": 4,
-        "design_draft": 1.2307692307692308,
-        "design_speed": 7.9808835831722895,
+        "beam_m": 4,
+        "design_draft_m": 1.2307692307692308,
+        "design_speed_kn": 7.9808835831722895,
         "double_ended": false,
-        "length": 15,
+        "length_m": 15,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 81.24362828203402,
+        "propulsion_engine_power_kw": 81.24362828203402,
         "propulsion_engine_type": "HSD",
         "size": 67.19999999999999,
         "type": "service-other"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[30-15-10-4-4-8-3.5-56.5-11.5-fishing]_1": {
-        "beam": 8,
-        "design_draft": 3.5,
-        "design_speed": 21.64728779385341,
+        "beam_m": 8,
+        "design_draft_m": 3.5,
+        "design_speed_kn": 21.64728779385341,
         "double_ended": false,
-        "length": 25,
+        "length_m": 25,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 374.4310936077655,
+        "propulsion_engine_power_kw": 374.4310936077655,
         "propulsion_engine_type": "HSD",
         "size": 441.0,
         "type": "miscellaneous-fishing"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[52-15-10-5-5-10-4-57.5-12.0-tug]_1": {
-        "beam": 10,
-        "design_draft": 4,
-        "design_speed": 10.303276401882151,
+        "beam_m": 10,
+        "design_draft_m": 4,
+        "design_speed_kn": 10.303276401882151,
         "double_ended": false,
-        "length": 25,
+        "length_m": 25,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 429.697010223062,
+        "propulsion_engine_power_kw": 429.697010223062,
         "propulsion_engine_type": "HSD",
         "size": 909.9999999999999,
         "type": "service-other"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[60-20-20-5-5-12-2.8-56.0-12.0-ferry_pax]_1": {
-        "beam": 10,
-        "design_draft": 2.8,
-        "design_speed": 15.723196851999262,
+        "beam_m": 10,
+        "design_draft_m": 2.8,
+        "design_speed_kn": 15.723196851999262,
         "double_ended": false,
-        "length": 40,
+        "length_m": 40,
         "number_of_propulsion_engines": 2,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 342.4869948609484,
+        "propulsion_engine_power_kw": 342.4869948609484,
         "propulsion_engine_type": "MSD",
         "size": 418.72656,
         "type": "ferry-ropax"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[61-120-60-14-14-20-6.5-58.5-13.5-ropax]_1": {
-        "beam": 28,
-        "design_draft": 8.615384615384615,
-        "design_speed": 33.35393734793897,
+        "beam_m": 28,
+        "design_draft_m": 8.615384615384615,
+        "design_speed_kn": 33.35393734793897,
         "double_ended": false,
-        "length": 180,
+        "length_m": 180,
         "number_of_propulsion_engines": 2,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 4153.162252003798,
+        "propulsion_engine_power_kw": 4153.162252003798,
         "propulsion_engine_type": "MSD",
         "size": 16233.70663384615,
         "type": "ferry-ropax"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[70-100-50-11-12-16-8.5-58.0-12.5-general_cargo]_1": {
-        "beam": 23,
-        "design_draft": 8.5,
-        "design_speed": 16.901657999475564,
+        "beam_m": 23,
+        "design_draft_m": 8.5,
+        "design_speed_kn": 16.901657999475564,
         "double_ended": false,
-        "length": 150,
+        "length_m": 150,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 4332.868134818988,
+        "propulsion_engine_power_kw": 4332.868134818988,
         "propulsion_engine_type": "SSD",
         "size": 15395.624999999998,
         "type": "general_cargo"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[70-200-50-20-22-18-10-55.5-13.0-container]_1": {
-        "beam": 42,
-        "design_draft": 12.923076923076923,
-        "design_speed": 21.819946651754073,
+        "beam_m": 42,
+        "design_draft_m": 12.923076923076923,
+        "design_speed_kn": 21.819946651754073,
         "double_ended": false,
-        "length": 250,
+        "length_m": 250,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 12031.936926164448,
+        "propulsion_engine_power_kw": 12031.936926164448,
         "propulsion_engine_type": "SSD",
         "size": 71238.46153846153,
         "type": "general_cargo"
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_vessel_data_pinned[80-150-50-15-15-14-12-57.0-11.0-oil_tanker]_1": {
-        "beam": 30,
-        "design_draft": 12,
-        "design_speed": 15.605907743200259,
+        "beam_m": 30,
+        "design_draft_m": 12,
+        "design_speed_kn": 15.605907743200259,
         "double_ended": false,
-        "length": 200,
+        "length_m": 200,
         "number_of_propulsion_engines": 1,
         "propulsion_engine_age": "after_2000",
         "propulsion_engine_fuel_type": "MDO",
-        "propulsion_engine_power": 8882.912889744446,
+        "propulsion_engine_power_kw": 8882.912889744446,
         "propulsion_engine_type": "SSD",
         "size": 47808.0,
         "type": "oil_tanker"
@@ -128,8 +128,8 @@
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_different_positions_zero_speed_pinned_1": {
         "legs_at_sea": [],
         "legs_manoeuvring": [],
-        "time_anchored": 5.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 5.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[55.0-10.0-55.5-11.0-7-7-0-15-8-16-7-complex_ops]_1": {
         "legs_at_sea": [],
@@ -140,8 +140,8 @@
                 7.0
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[56.0-12.0-56.1-12.1-2.8-2.8-12-12-2-13.5-2.84-short_coastal]_1": {
         "legs_at_sea": [],
@@ -152,8 +152,8 @@
                 2.8
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[56.5-11.5-56.52-11.55-3.5-3.5-5-6-0.5-10-3.5-maneuvering]_1": {
         "legs_at_sea": [],
@@ -164,8 +164,8 @@
                 3.5
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[57.0-11.0-57.5-12.0-12-10-14-14-10-15-12-medium_draft_change]_1": {
         "legs_at_sea": [],
@@ -176,8 +176,8 @@
                 11.0
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[57.5-12.0-58.0-13.0-6.5-6.5-0-20-5-22-6.5-berth_to_sea]_1": {
         "legs_at_sea": [],
@@ -188,8 +188,8 @@
                 6.5
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_pinned[58.0-12.0-60.0-15.0-8.5-7.0-16-16-50-18-8.5-long_voyage]_1": {
         "legs_at_sea": [],
@@ -200,14 +200,14 @@
                 7.75
             ]
         ],
-        "time_anchored": 0.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 0.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_ais_adapter_pinned.py::test_guesstimate_voyage_data_stationary_vessel_pinned_1": {
         "legs_at_sea": [],
         "legs_manoeuvring": [],
-        "time_anchored": 10.0,
-        "time_at_berth": 0.0
+        "time_anchored_h": 10.0,
+        "time_at_berth_h": 0.0
     },
     "tests/test_energy_systems_pinned.py::test_estimate_battery_system_high_energy_density_pinned_1": {
         "details": {
@@ -1388,15 +1388,15 @@
             "total_weight_kg": 1284.7174349392862
         },
         "vessel_data": {
-            "beam": 10,
-            "design_draft": 2.8,
-            "design_speed": 15.723196851999262,
+            "beam_m": 10,
+            "design_draft_m": 2.8,
+            "design_speed_kn": 15.723196851999262,
             "double_ended": false,
-            "length": 40,
+            "length_m": 40,
             "number_of_propulsion_engines": 2,
             "propulsion_engine_age": "after_2000",
             "propulsion_engine_fuel_type": "MDO",
-            "propulsion_engine_power": 342.4869948609484,
+            "propulsion_engine_power_kw": 342.4869948609484,
             "propulsion_engine_type": "MSD",
             "size": 418.72656,
             "type": "ferry-ropax"
@@ -1410,8 +1410,8 @@
                     2.8
                 ]
             ],
-            "time_anchored": 0.0,
-            "time_at_berth": 0.0
+            "time_anchored_h": 0.0,
+            "time_at_berth_h": 0.0
         }
     }
 }

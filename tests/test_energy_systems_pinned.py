@@ -6,6 +6,8 @@ including internal combustion, battery, hydrogen, and alternative energy systems
 They serve as a safety net during refactoring.
 """
 
+from dataclasses import asdict, is_dataclass
+
 import pytest
 from fixtures import (
     FERRY_PAX_DAILY_VOYAGE,
@@ -26,10 +28,12 @@ from cetos.energy_systems import (
 
 def _to_json_serializable(obj):
     """
-    Convert tuples to lists for JSON serialization compatibility.
+    Convert dataclasses and tuples to dicts/lists for JSON serialization compatibility.
     pytest-pinned stores results as JSON, which converts tuples to lists.
     """
-    if isinstance(obj, tuple):
+    if is_dataclass(obj) and not isinstance(obj, type):
+        return {key: _to_json_serializable(value) for key, value in asdict(obj).items()}
+    elif isinstance(obj, tuple):
         return [_to_json_serializable(item) for item in obj]
     elif isinstance(obj, list):
         return [_to_json_serializable(item) for item in obj]

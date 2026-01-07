@@ -8,30 +8,34 @@ from cetos.energy_systems import (
     suggest_alternative_energy_systems_simple,
 )
 from cetos.imo import estimate_energy_consumption
+from cetos.models import VesselData, VoyageLeg, VoyageProfile
 
-DUMMY_VESSEL_DATA = {
-    "length": 39.8,  # meters
-    "beam": 10.46,  # meteres
-    "design_speed": 13.5,  # knots
-    "design_draft": 2.84,  # meters
-    "double_ended": False,  # True or False
-    "number_of_propulsion_engines": 4,
-    "propulsion_engine_power": 330,  # per engine kW
-    "propulsion_engine_type": "MSD",
-    "propulsion_engine_age": "after_2000",
-    "propulsion_engine_fuel_type": "MDO",
-    "type": "ferry-pax",
-    "size": 686,  # GT
-}
+DUMMY_VESSEL_DATA = VesselData(
+    length_m=39.8,
+    beam_m=10.46,
+    design_speed_kn=13.5,
+    design_draft_m=2.84,
+    double_ended=False,
+    number_of_propulsion_engines=4,
+    propulsion_engine_power_kw=330,
+    propulsion_engine_type="MSD",
+    propulsion_engine_age="after_2000",
+    propulsion_engine_fuel_type="MDO",
+    type="ferry-pax",
+    size=686,
+)
 
-DUMMY_VOYAGE_PROFILE = {
-    "time_anchored": 10.0,  # time
-    "time_at_berth": 10.0,  # time
-    "legs_manoeuvring": [
-        (10, 10, 3),  # distance (nm), speed (kn), draft (m)
+DUMMY_VOYAGE_PROFILE = VoyageProfile(
+    time_anchored_h=10.0,
+    time_at_berth_h=10.0,
+    legs_manoeuvring=[
+        VoyageLeg(10, 10, 3),  # distance (nm), speed (kn), draft (m)
     ],
-    "legs_at_sea": [(30, 10, 3), (30, 10, 3)],  # distance (nm), speed (kn), draft (m)
-}
+    legs_at_sea=[
+        VoyageLeg(30, 10, 3),
+        VoyageLeg(30, 10, 3),
+    ],
+)
 
 
 def test_estimate_vessel_battery_system():
@@ -98,12 +102,12 @@ def test_suggest_alternative_energy_systems():
 
     # If the draft change is lower than 1% of the design draft there should be no
     # differences
-    if abs(battery["change_in_draft_m"]) < DUMMY_VESSEL_DATA["design_draft"] * 0.01:
+    if abs(battery["change_in_draft_m"]) < DUMMY_VESSEL_DATA.design_draft_m * 0.01:
         assert battery_o["total_weight_kg"] == battery["total_weight_kg"]
     else:
         assert battery_o["total_weight_kg"] != battery["total_weight_kg"]
 
-    if abs(gas["change_in_draft_m"]) < DUMMY_VESSEL_DATA["design_draft"] * 0.01:
+    if abs(gas["change_in_draft_m"]) < DUMMY_VESSEL_DATA.design_draft_m * 0.01:
         assert gas_o["total_weight_kg"] == gas["total_weight_kg"]
     else:
         assert gas_o["total_weight_kg"] != gas["total_weight_kg"]

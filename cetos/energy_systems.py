@@ -2,6 +2,7 @@
 Energy Systems
 """
 
+import copy
 import math
 
 from cetos.imo import (
@@ -11,6 +12,7 @@ from cetos.imo import (
     verify_vessel_data,
     verify_voyage_profile,
 )
+from cetos.models import VesselData, VoyageLeg, VoyageProfile
 from cetos.utils import knots_to_ms, verify_range
 
 DENSITY_SEAWATER = 1025  # kg/m3
@@ -95,14 +97,14 @@ def estimate_internal_combustion_engine(power_kw):
     return details
 
 
-def _estimate_change_in_draft(vessel_data, load_change):
+def _estimate_change_in_draft(vessel_data: VesselData, load_change):
     """Estimate the change in draft of a vessel due to a change in load.
 
     Arguments:
     ----------
 
         vessel_data
-            Dict containing the vessel data.
+            VesselData instance containing the vessel data.
 
         load_change
             Change in load (kg)
@@ -121,11 +123,11 @@ def _estimate_change_in_draft(vessel_data, load_change):
     """
 
     # Approximations of length and breadth on waterline (l_wl, b_wl)
-    l_wl = vessel_data["length"] * 0.98
-    b_wl = vessel_data["beam"]
+    l_wl = vessel_data.length_m * 0.98
+    b_wl = vessel_data.beam_m
 
     # Approximation of design block coefficient (c_b)
-    f_n = 0.5144 * knots_to_ms(vessel_data["design_speed"]) / math.sqrt(9.81 * l_wl)
+    f_n = 0.5144 * knots_to_ms(vessel_data.design_speed_kn) / math.sqrt(9.81 * l_wl)
     c_b = 0.7 + (1 / 8) * math.atan((23 - 100 * f_n) / 4)
 
     # Approximation of the waterplane area coefficient (c_wp)
@@ -140,18 +142,18 @@ def _estimate_change_in_draft(vessel_data, load_change):
     return draft_change
 
 
-def estimate_internal_combustion_system(vessel_data, voyage_profile):
+def estimate_internal_combustion_system(vessel_data: VesselData, voyage_profile: VoyageProfile):
     """Estimate the key details of an internal combustion system for a vessel
     and voyage profile
 
     Arguments:
     ----------
 
-        vessel_data: Dict
-            Dictionary containing the vessel data.
+        vessel_data: VesselData
+            VesselData instance containing the vessel data.
 
-        voyage_profile: Dict
-            Dictionary containing the voyage profile.
+        voyage_profile: VoyageProfile
+            VoyageProfile instance containing the voyage profile.
 
     Returns:
     --------
@@ -168,15 +170,15 @@ def estimate_internal_combustion_system(vessel_data, voyage_profile):
 
     # Propulsion engines
     prop_engines = estimate_internal_combustion_engine(
-        vessel_data["propulsion_engine_power"]
+        vessel_data.propulsion_engine_power_kw
     )
-    prop_engines["weight_kg"] *= vessel_data["number_of_propulsion_engines"]
-    prop_engines["volume_m3"] *= vessel_data["number_of_propulsion_engines"]
+    prop_engines["weight_kg"] *= vessel_data.number_of_propulsion_engines
+    prop_engines["volume_m3"] *= vessel_data.number_of_propulsion_engines
 
     # Gearboxes
     # Slow-Speed Diesel engines are assumed to not have a gearbox.
     # Gearboxes are assumed to have 1/5 of the weight and volumeof the engine.
-    if vessel_data["propulsion_engine_type"] != "SSD":
+    if vessel_data.propulsion_engine_type != "SSD":
         gearboxes_weight_kg = prop_engines["weight_kg"] / 5.0
         gearboxes_volume_m3 = prop_engines["volume_m3"] / 5.0
     else:
@@ -191,7 +193,7 @@ def estimate_internal_combustion_system(vessel_data, voyage_profile):
         delta_w=0.8,
     )
 
-    fc_m3 = calculate_fuel_volume(fc_kg, vessel_data["propulsion_engine_fuel_type"])
+    fc_m3 = calculate_fuel_volume(fc_kg, vessel_data.propulsion_engine_fuel_type)
 
     # Totals
     total_weight = prop_engines["weight_kg"] + gearboxes_weight_kg + fc_kg
@@ -203,15 +205,15 @@ def estimate_internal_combustion_system(vessel_data, voyage_profile):
         "weight_breakdown": {
             "propulsion_engines": {
                 "weight_per_engine_kg": prop_engines["weight_kg"]
-                / vessel_data["number_of_propulsion_engines"],
+                / vessel_data.number_of_propulsion_engines,
                 "volume_per_engine_m3": prop_engines["volume_m3"]
-                / vessel_data["number_of_propulsion_engines"],
+                / vessel_data.number_of_propulsion_engines,
             },
             "gearboxes": {
                 "weight_per_gearbox_kg": gearboxes_weight_kg
-                / vessel_data["number_of_propulsion_engines"],
+                / vessel_data.number_of_propulsion_engines,
                 "volume_per_gearbox_m3": gearboxes_volume_m3
-                / vessel_data["number_of_propulsion_engines"],
+                / vessel_data.number_of_propulsion_engines,
             },
             "fuel": {"weight_kg": fc_kg, "volume_m3": fc_m3},
         },
@@ -416,7 +418,7 @@ def estimate_vessel_gas_hydrogen_system(
     }
 
 
-def suggest_alternative_energy_systems(vessel_data, voyage_profile, reference_values):
+def suggest_alternative_energy_systems(vessel_data: VesselData, voyage_profile: VoyageProfile, reference_values):
     """Suggest alternative energy systems"""
     _verify_reference_values(reference_values)
     verify_vessel_data(vessel_data)
@@ -468,8 +470,8 @@ def suggest_alternative_energy_systems_simple(
 
 
 def _iterate_energy_system(
-    vessel_data,
-    voyage_profile,
+    vessel_data: VesselData,
+    voyage_profile: VoyageProfile,
     reference_values,
     estimate_energy_system,
     include_steam_boilers=False,
@@ -480,7 +482,11 @@ def _iterate_energy_system(
     ice = estimate_internal_combustion_system(vessel_data, voyage_profile)
     weight = ice["total_weight_kg"]
     iteration = 0
-    voyage_profile_copy = voyage_profile.copy()
+    voyage_profile_copy = copy.copy(voyage_profile)
+    # Deep copy the leg lists since we'll modify them
+    voyage_profile_copy.legs_manoeuvring = list(voyage_profile.legs_manoeuvring)
+    voyage_profile_copy.legs_at_sea = list(voyage_profile.legs_at_sea)
+
     while iteration < 100:
         energy = estimate_energy_consumption(
             vessel_data,
@@ -500,16 +506,16 @@ def _iterate_energy_system(
             vessel_data, new_system["total_weight_kg"] - weight
         )
 
-        if abs(change_draft) < vessel_data["design_draft"] * 0.01:
+        if abs(change_draft) < vessel_data.design_draft_m * 0.01:
             break
 
-        voyage_profile_copy["legs_manoeuvring"] = [
-            (distance, speed, draft + change_draft)
-            for distance, speed, draft in voyage_profile_copy["legs_manoeuvring"]
+        voyage_profile_copy.legs_manoeuvring = [
+            VoyageLeg(leg.distance_nm, leg.speed_kn, leg.draft_m + change_draft)
+            for leg in voyage_profile_copy.legs_manoeuvring
         ]
-        voyage_profile_copy["legs_at_sea"] = [
-            (distance, speed, draft + change_draft)
-            for distance, speed, draft in voyage_profile_copy["legs_at_sea"]
+        voyage_profile_copy.legs_at_sea = [
+            VoyageLeg(leg.distance_nm, leg.speed_kn, leg.draft_m + change_draft)
+            for leg in voyage_profile_copy.legs_at_sea
         ]
         weight = new_system["total_weight_kg"]
         iteration += 1

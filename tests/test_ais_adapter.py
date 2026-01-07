@@ -100,20 +100,20 @@ def test_guesstimate_CBM():
 def test_guesstimate_vessel_data():
     vdata = cais.guesstimate_vessel_data(83, 180, 20, 15, 15, 11.7, 6, 0.0, 0.0)
 
-    assert vdata["type"] == "oil_tanker"
-    assert vdata["length"] == 200
-    assert vdata["beam"] == 30
-    assert vdata["design_draft"] != 6
-    assert vdata["number_of_propulsion_engines"] == 1
-    assert vdata["propulsion_engine_type"] == "SSD"
-    assert vdata["propulsion_engine_fuel_type"] == "MDO"
+    assert vdata.type == "oil_tanker"
+    assert vdata.length_m == 200
+    assert vdata.beam_m == 30
+    assert vdata.design_draft_m != 6
+    assert vdata.number_of_propulsion_engines == 1
+    assert vdata.propulsion_engine_type == "SSD"
+    assert vdata.propulsion_engine_fuel_type == "MDO"
 
-    assert not vdata["double_ended"]
-    assert vdata["propulsion_engine_age"] == "after_2000"
+    assert not vdata.double_ended
+    assert vdata.propulsion_engine_age == "after_2000"
 
-    assert "size" in vdata.keys()
-    assert "design_speed" in vdata.keys()
-    assert "propulsion_engine_power" in vdata.keys()
+    assert vdata.size is not None
+    assert vdata.design_speed_kn is not None
+    assert vdata.propulsion_engine_power_kw is not None
 
     assert verify_vessel_data(vdata) is None  # Will raise if vdata is not ok
 
@@ -134,14 +134,14 @@ def test_guesstimate_voyage_data():
         5,
     )
 
-    assert "time_anchored" in vdata.keys()
-    assert "time_at_berth" in vdata.keys()
-    assert "legs_manoeuvring" in vdata.keys()
-    assert "legs_at_sea" in vdata.keys()
+    assert vdata.time_anchored_h is not None
+    assert vdata.time_at_berth_h is not None
+    assert vdata.legs_manoeuvring is not None
+    assert vdata.legs_at_sea is not None
 
     print(vdata)
 
-    assert vdata["time_anchored"] == 0
-    assert vdata["time_at_berth"] == 0
-    assert len(vdata["legs_manoeuvring"]) == 0
-    assert len(vdata["legs_at_sea"]) == 1
+    assert vdata.time_anchored_h == 0
+    assert vdata.time_at_berth_h == 0
+    assert len(vdata.legs_manoeuvring) == 0
+    assert len(vdata.legs_at_sea) == 1
