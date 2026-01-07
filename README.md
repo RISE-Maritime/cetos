@@ -1,13 +1,11 @@
 ![cetos-logo](./cetos-logo.svg)
 
-# cetos
+# Open-source tools for analyzing vessel data.
 
 [![CI](https://github.com/RISE-Maritime/cetos/workflows/CI%20checks/badge.svg)](https://github.com/RISE-Maritime/cetos/actions)
 [![PyPI](https://img.shields.io/pypi/v/cetos)](https://pypi.org/project/cetos/)
 [![Python Version](https://img.shields.io/pypi/pyversions/cetos)](https://pypi.org/project/cetos/)
 [![License](https://img.shields.io/github/license/RISE-Maritime/cetos)](https://github.com/RISE-Maritime/cetos/blob/main/LICENSE)
-
-Open-source tools for analyzing vessel data.
 
 ## Overview
 
