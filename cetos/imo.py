@@ -4,116 +4,43 @@ Estimates of fuel and energy consumption for vessels.
 
 # pylint: disable=too-many-locals
 
-from cetos.models import VesselData, VoyageProfile
+from cetos.models import (
+    ENGINE_AGES,
+    ENGINE_TYPES,
+    FUEL_TYPES,
+    MIN_VESSEL_DRAFT_M,
+    VesselData,
+    VoyageProfile,
+)
 from cetos.utils import (
     verify_range,
     verify_set,
 )
 
-VESSEL_TYPES = [
-    "bulk_carrier",
-    "chemical_tanker",
-    "container",
-    "general_cargo",
-    "liquified_gas_tanker",
-    "oil_tanker",
-    "other_liquids_tanker",
-    "ferry-pax",
-    "cruise",
-    "ferry-ropax",
-    "refrigerated_cargo",
-    "roro",
-    "vehicle",
-    "yacht",
-    "miscellaneous-fishing",
-    "service-tug",
-    "offshore",
-    "service-other",
-    "miscellaneous-other",
-]
-
-FUEL_TYPES = ["HFO", "MDO", "MeOH", "LNG"]
-
-ENGINE_TYPES = [
-    "SSD",
-    "MSD",
-    "HSD",
-    "LNG-Otto-MS",
-    "LBSI",
-    "gas_turbine",
-    "steam_turbine",
-]
-
-ENGINE_AGES = ["before_1984", "1984-2000", "after_2000"]
-
-
-MAX_VESSEL_SPEED_KN = 50
-MIN_VESSEL_DRAFT = 0.1
-MAX_VESSEL_DRAFT_M = 25
-MIN_ENGINE_RPM = 50
-MIN_ENGINE_POWER_KW = 5
-MAX_ENGINE_RPM = 5_000
-MAX_ENGINE_POWER_KW = 60_000
+# Keep old name for backwards compatibility
+MIN_VESSEL_DRAFT = MIN_VESSEL_DRAFT_M
 
 
 def verify_vessel_data(vessel_data: VesselData):
-    """Verify the contents of a VesselData instance."""
+    """Verify the contents of a VesselData instance.
 
-    verify_range("length_m", vessel_data.length_m, 5.0, 450.0)
-    verify_range("beam_m", vessel_data.beam_m, 1.5, 70.0)
-    verify_range(
-        "design_speed_kn", vessel_data.design_speed_kn, 1.0, MAX_VESSEL_SPEED_KN
-    )
-    verify_range(
-        "design_draft_m",
-        vessel_data.design_draft_m,
-        MIN_VESSEL_DRAFT,
-        MAX_VESSEL_DRAFT_M,
-    )
-    verify_set(
-        "number_of_propulsion_engines",
-        vessel_data.number_of_propulsion_engines,
-        [1, 2, 3, 4],
-    )
-    verify_range(
-        "propulsion_engine_power_kw",
-        vessel_data.propulsion_engine_power_kw,
-        MIN_ENGINE_POWER_KW,
-        MAX_ENGINE_POWER_KW,
-    )
-    verify_set(
-        "propulsion_engine_type", vessel_data.propulsion_engine_type, ENGINE_TYPES
-    )
-    verify_set("propulsion_engine_age", vessel_data.propulsion_engine_age, ENGINE_AGES)
-    verify_set(
-        "propulsion_engine_fuel_type",
-        vessel_data.propulsion_engine_fuel_type,
-        FUEL_TYPES,
-    )
-    verify_set("type", vessel_data.type, VESSEL_TYPES)
-    verify_set("double_ended", vessel_data.double_ended, [True, False])
-
-    if vessel_data.size is not None:
-        verify_range("size", vessel_data.size, 0, 500_000)
+    Note: Validation now happens automatically in VesselData.__post_init__.
+    This function is kept for backwards compatibility.
+    """
+    # Validation is performed in __post_init__, so we just need to trigger it
+    # by calling the validation method directly
+    vessel_data.__post_init__()
 
 
 def verify_voyage_profile(voyage_profile: VoyageProfile):
-    """Verify the contents of a VoyageProfile instance."""
-    max_hours = 24 * 365  # One year's worth of hours
+    """Verify the contents of a VoyageProfile instance.
 
-    if not isinstance(voyage_profile.time_anchored_h, (int, float)):
-        raise ValueError("time_anchored_h must be a float")
-    verify_range("time_anchored_h", voyage_profile.time_anchored_h, 0, max_hours)
-
-    if not isinstance(voyage_profile.time_at_berth_h, (int, float)):
-        raise ValueError("time_at_berth_h must be a float")
-    verify_range("time_at_berth_h", voyage_profile.time_at_berth_h, 0, max_hours)
-
-    if not isinstance(voyage_profile.legs_manoeuvring, list):
-        raise ValueError("legs_manoeuvring must be a list")
-
-    if not isinstance(voyage_profile.legs_at_sea, list):
-        raise ValueError("legs_at_sea must be a list")
+    Note: Validation now happens automatically in VoyageProfile.__post_init__.
+    This function is kept for backwards compatibility.
+    """
+    # Validation is performed in __post_init__, so we just need to trigger it
+    # by calling the validation method directly
+    voyage_profile.__post_init__()
 
 
 def calculate_fuel_volume(mass, fuel_type):

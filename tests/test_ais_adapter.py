@@ -119,6 +119,9 @@ def test_guesstimate_vessel_data():
 
 
 def test_guesstimate_voyage_data():
+    # Use realistic time that matches the distance at given speed
+    # Distance from (56,12) to (56,11) is ~33.5 nm at lat 56
+    # At ~19 kn average, this takes ~1.76 hours = ~6350 seconds
     vdata = cais.guesstimate_voyage_data(
         56,
         12,
@@ -129,7 +132,7 @@ def test_guesstimate_voyage_data():
         18,
         20,
         datetime.fromtimestamp(0),
-        datetime.fromtimestamp(10_000 / 3600),
+        datetime.fromtimestamp(6350),
         23,
         5,
     )

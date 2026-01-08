@@ -76,16 +76,14 @@ def test_verify_vessel_data():
     # Correct data, no error raises
     verify_vessel_data(vessel_data)
 
-    # Invalid fuel type
-    vessel_data_bad_fuel = replace(vessel_data, propulsion_engine_fuel_type="blue")
+    # Invalid fuel type - now caught at construction time via __post_init__
     with raises(ValueError) as info:
-        verify_vessel_data(vessel_data_bad_fuel)
+        replace(vessel_data, propulsion_engine_fuel_type="blue")
     assert "propulsion_engine_fuel_type" in str(info)
 
-    # Invalid engine type
-    vessel_data_bad_engine = replace(vessel_data, propulsion_engine_type="blue")
+    # Invalid engine type - now caught at construction time via __post_init__
     with raises(ValueError) as info:
-        verify_vessel_data(vessel_data_bad_engine)
+        replace(vessel_data, propulsion_engine_type="blue")
     assert "propulsion_engine_type" in str(info)
 
 
