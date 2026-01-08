@@ -142,7 +142,9 @@ def _estimate_change_in_draft(vessel_data: VesselData, load_change):
     return draft_change
 
 
-def estimate_internal_combustion_system(vessel_data: VesselData, voyage_profile: VoyageProfile):
+def estimate_internal_combustion_system(
+    vessel_data: VesselData, voyage_profile: VoyageProfile
+):
     """Estimate the key details of an internal combustion system for a vessel
     and voyage profile
 
@@ -418,7 +420,9 @@ def estimate_vessel_gas_hydrogen_system(
     }
 
 
-def suggest_alternative_energy_systems(vessel_data: VesselData, voyage_profile: VoyageProfile, reference_values):
+def suggest_alternative_energy_systems(
+    vessel_data: VesselData, voyage_profile: VoyageProfile, reference_values
+):
     """Suggest alternative energy systems"""
     _verify_reference_values(reference_values)
     verify_vessel_data(vessel_data)

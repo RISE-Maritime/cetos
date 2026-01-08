@@ -4,7 +4,7 @@ Estimates of fuel and energy consumption for vessels.
 
 # pylint: disable=too-many-locals
 
-from cetos.models import VesselData, VoyageLeg, VoyageProfile
+from cetos.models import VesselData, VoyageProfile
 from cetos.utils import (
     verify_range,
     verify_set,
@@ -61,9 +61,14 @@ def verify_vessel_data(vessel_data: VesselData):
 
     verify_range("length_m", vessel_data.length_m, 5.0, 450.0)
     verify_range("beam_m", vessel_data.beam_m, 1.5, 70.0)
-    verify_range("design_speed_kn", vessel_data.design_speed_kn, 1.0, MAX_VESSEL_SPEED_KN)
     verify_range(
-        "design_draft_m", vessel_data.design_draft_m, MIN_VESSEL_DRAFT, MAX_VESSEL_DRAFT_M
+        "design_speed_kn", vessel_data.design_speed_kn, 1.0, MAX_VESSEL_SPEED_KN
+    )
+    verify_range(
+        "design_draft_m",
+        vessel_data.design_draft_m,
+        MIN_VESSEL_DRAFT,
+        MAX_VESSEL_DRAFT_M,
     )
     verify_set(
         "number_of_propulsion_engines",
@@ -509,7 +514,9 @@ def estimate_auxiliary_power_demand(vessel_data: VesselData, operation_mode):
     return aux_engine_power, boiler_power
 
 
-def estimate_propulsion_engine_load(speed, draft, vessel_data: VesselData, delta_w=None):
+def estimate_propulsion_engine_load(
+    speed, draft, vessel_data: VesselData, delta_w=None
+):
     """Estimate the propulsion engine load of a vessel
 
     Arguments:
@@ -798,7 +805,10 @@ def estimate_instantanous_fuel_consumption_of_propulsion_engines(
 
 
 def estimate_fuel_consumption_of_propulsion_engines(
-    vessel_data: VesselData, voyage_profile: VoyageProfile, limit_7_percent=True, delta_w=None
+    vessel_data: VesselData,
+    voyage_profile: VoyageProfile,
+    limit_7_percent=True,
+    delta_w=None,
 ):
     """
     Arguments:
@@ -993,9 +1003,7 @@ def estimate_fuel_consumption(
     )
 
     # At sea
-    fc_at_sea = _estimate_sailing_fuel_consumption(
-        voyage_profile.legs_at_sea, "at_sea"
-    )
+    fc_at_sea = _estimate_sailing_fuel_consumption(voyage_profile.legs_at_sea, "at_sea")
 
     return {
         "total_kg": fc_at_berth["subtotal_kg"]
