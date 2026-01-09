@@ -9,8 +9,6 @@ from cetos.imo import (
     calculate_fuel_volume,
     estimate_energy_consumption,
     estimate_fuel_consumption_of_propulsion_engines,
-    verify_vessel_data,
-    verify_voyage_profile,
 )
 from cetos.models import VesselData, VoyageLeg, VoyageProfile
 from cetos.utils import knots_to_ms, verify_range
@@ -425,8 +423,6 @@ def suggest_alternative_energy_systems(
 ):
     """Suggest alternative energy systems"""
     _verify_reference_values(reference_values)
-    verify_vessel_data(vessel_data)
-    verify_voyage_profile(voyage_profile)
 
     gas = _iterate_energy_system(
         vessel_data,

@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from cetos.utils import verify_range, verify_set
+
 # Validation constants
 VESSEL_TYPES = [
     "bulk_carrier",
@@ -47,22 +49,7 @@ MAX_VESSEL_DRAFT_M = 25
 MIN_ENGINE_POWER_KW = 5
 MAX_ENGINE_POWER_KW = 60_000
 
-
-def _verify_range(name: str, value: float, lower_limit: float, upper_limit: float):
-    """Verify that a value is within a specified range."""
-    if value < lower_limit or value > upper_limit:
-        raise ValueError(
-            f"The value of {value} for '{name}' is not within the "
-            f"range [{lower_limit}, {upper_limit}]."
-        )
-
-
-def _verify_set(name: str, value, valid_set):
-    """Verify that a value is within a specified set."""
-    if value not in valid_set:
-        raise ValueError(
-            f"The value '{value}' for '{name}' is not in the set {valid_set}."
-        )
+MAX_HOURS = 24 * 365  # One year's worth of hours
 
 
 @dataclass
@@ -75,9 +62,9 @@ class VoyageLeg:
 
     def __post_init__(self):
         """Validate voyage leg data."""
-        _verify_range("distance_nm", self.distance_nm, 0, 50_000)
-        _verify_range("speed_kn", self.speed_kn, 0.1, MAX_VESSEL_SPEED_KN)
-        _verify_range("draft_m", self.draft_m, MIN_VESSEL_DRAFT_M, MAX_VESSEL_DRAFT_M)
+        verify_range("distance_nm", self.distance_nm, 0, 50_000)
+        verify_range("speed_kn", self.speed_kn, 0.1, MAX_VESSEL_SPEED_KN)
+        verify_range("draft_m", self.draft_m, MIN_VESSEL_DRAFT_M, MAX_VESSEL_DRAFT_M)
 
 
 @dataclass
@@ -104,36 +91,36 @@ class VesselData:
 
     def __post_init__(self):
         """Validate vessel data."""
-        _verify_range("length_m", self.length_m, 5.0, 450.0)
-        _verify_range("beam_m", self.beam_m, 1.5, 70.0)
-        _verify_range("design_speed_kn", self.design_speed_kn, 1.0, MAX_VESSEL_SPEED_KN)
-        _verify_range(
+        verify_range("length_m", self.length_m, 5.0, 450.0)
+        verify_range("beam_m", self.beam_m, 1.5, 70.0)
+        verify_range("design_speed_kn", self.design_speed_kn, 1.0, MAX_VESSEL_SPEED_KN)
+        verify_range(
             "design_draft_m",
             self.design_draft_m,
             MIN_VESSEL_DRAFT_M,
             MAX_VESSEL_DRAFT_M,
         )
-        _verify_set(
+        verify_set(
             "number_of_propulsion_engines",
             self.number_of_propulsion_engines,
             [1, 2, 3, 4],
         )
-        _verify_range(
+        verify_range(
             "propulsion_engine_power_kw",
             self.propulsion_engine_power_kw,
             MIN_ENGINE_POWER_KW,
             MAX_ENGINE_POWER_KW,
         )
-        _verify_set("propulsion_engine_type", self.propulsion_engine_type, ENGINE_TYPES)
-        _verify_set("propulsion_engine_age", self.propulsion_engine_age, ENGINE_AGES)
-        _verify_set(
+        verify_set("propulsion_engine_type", self.propulsion_engine_type, ENGINE_TYPES)
+        verify_set("propulsion_engine_age", self.propulsion_engine_age, ENGINE_AGES)
+        verify_set(
             "propulsion_engine_fuel_type", self.propulsion_engine_fuel_type, FUEL_TYPES
         )
-        _verify_set("type", self.type, VESSEL_TYPES)
-        _verify_set("double_ended", self.double_ended, [True, False])
+        verify_set("type", self.type, VESSEL_TYPES)
+        verify_set("double_ended", self.double_ended, [True, False])
 
         if self.size is not None:
-            _verify_range("size", self.size, 0, 500_000)
+            verify_range("size", self.size, 0, 500_000)
 
 
 @dataclass
@@ -147,16 +134,15 @@ class VoyageProfile:
 
     def __post_init__(self):
         """Convert raw tuples to VoyageLeg dataclasses if needed and validate."""
-        max_hours = 24 * 365  # One year's worth of hours
 
         # Validate time values
         if not isinstance(self.time_anchored_h, (int, float)):
             raise ValueError("time_anchored_h must be a number")
-        _verify_range("time_anchored_h", self.time_anchored_h, 0, max_hours)
+        verify_range("time_anchored_h", self.time_anchored_h, 0, MAX_HOURS)
 
         if not isinstance(self.time_at_berth_h, (int, float)):
             raise ValueError("time_at_berth_h must be a number")
-        _verify_range("time_at_berth_h", self.time_at_berth_h, 0, max_hours)
+        verify_range("time_at_berth_h", self.time_at_berth_h, 0, MAX_HOURS)
 
         # Validate legs are lists
         if not isinstance(self.legs_manoeuvring, list):

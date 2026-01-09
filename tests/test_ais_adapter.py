@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 import cetos.ais_adapter as cais
-from cetos.imo import verify_vessel_data
+from cetos.models import VesselData
 
 
 def test_shiptype_mapping():
@@ -115,7 +115,7 @@ def test_guesstimate_vessel_data():
     assert vdata.design_speed_kn is not None
     assert vdata.propulsion_engine_power_kw is not None
 
-    assert verify_vessel_data(vdata) is None  # Will raise if vdata is not ok
+    assert isinstance(vdata, VesselData)  # Validation happens on creation
 
 
 def test_guesstimate_voyage_data():

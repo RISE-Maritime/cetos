@@ -21,28 +21,6 @@ from cetos.utils import (
 MIN_VESSEL_DRAFT = MIN_VESSEL_DRAFT_M
 
 
-def verify_vessel_data(vessel_data: VesselData):
-    """Verify the contents of a VesselData instance.
-
-    Note: Validation now happens automatically in VesselData.__post_init__.
-    This function is kept for backwards compatibility.
-    """
-    # Validation is performed in __post_init__, so we just need to trigger it
-    # by calling the validation method directly
-    vessel_data.__post_init__()
-
-
-def verify_voyage_profile(voyage_profile: VoyageProfile):
-    """Verify the contents of a VoyageProfile instance.
-
-    Note: Validation now happens automatically in VoyageProfile.__post_init__.
-    This function is kept for backwards compatibility.
-    """
-    # Validation is performed in __post_init__, so we just need to trigger it
-    # by calling the validation method directly
-    voyage_profile.__post_init__()
-
-
 def calculate_fuel_volume(mass, fuel_type):
     """Calculate the fuel volume
 
@@ -286,8 +264,6 @@ def estimate_auxiliary_power_demand(vessel_data: VesselData, operation_mode):
         ["at_berth", "anchored", "manoeuvring", "at_sea"],
     )
 
-    verify_vessel_data(vessel_data)
-
     # Reproduction of Table 17 in page 68 of [1] as dictionaries
     vessel_sizes = {
         "bulk_carrier": [0, 10_000, 35_000, 60_000, 100_000, 200_000],
@@ -485,7 +461,6 @@ def estimate_propulsion_engine_load(
         vessel_data.design_draft_m * 0.3,
         vessel_data.design_draft_m * 1.5,
     )
-    verify_vessel_data(vessel_data)
     if delta_w is not None:
         verify_range("delta_w", delta_w, 0, 1)
 

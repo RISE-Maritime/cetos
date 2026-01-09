@@ -9,8 +9,6 @@ from cetos.imo import (
     estimate_instantaneous_fuel_consumption_of_auxiliary_systems,
     estimate_propulsion_engine_load,
     estimate_specific_fuel_consumption,
-    verify_vessel_data,
-    verify_voyage_profile,
 )
 from cetos.models import VesselData, VoyageLeg, VoyageProfile
 
@@ -68,23 +66,6 @@ def test_estimate_specific_fuel_consumption():
     )
     assert sfc_1 == sfc_2
     assert sfc_3 == sfc_2
-
-
-def test_verify_vessel_data():
-    vessel_data = DUMMY_VESSEL_DATA
-
-    # Correct data, no error raises
-    verify_vessel_data(vessel_data)
-
-    # Invalid fuel type - now caught at construction time via __post_init__
-    with raises(ValueError) as info:
-        replace(vessel_data, propulsion_engine_fuel_type="blue")
-    assert "propulsion_engine_fuel_type" in str(info)
-
-    # Invalid engine type - now caught at construction time via __post_init__
-    with raises(ValueError) as info:
-        replace(vessel_data, propulsion_engine_type="blue")
-    assert "propulsion_engine_type" in str(info)
 
 
 def test_estimate_auxiliary_power_demand():
@@ -149,11 +130,6 @@ def test_estimate_instantaneous_fuel_consumption_of_auxiliary_systems():
     )
     assert ifc_aux_2 == ifc_aux_1
     assert ifc_boiler_2 == ifc_boiler_1
-
-
-def test_verify_voyage_profile():
-    # Valid voyage profile, no error
-    verify_voyage_profile(DUMMY_VOYAGE_PROFILE)
 
 
 def test_estimate_fuel_consumption():
