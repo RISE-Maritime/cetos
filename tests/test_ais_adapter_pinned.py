@@ -5,6 +5,7 @@ These tests capture the complete output behavior of vessel and voyage data
 estimation from AIS messages. They serve as a safety net during refactoring.
 """
 
+from dataclasses import asdict, is_dataclass
 from datetime import datetime
 
 import pytest
@@ -14,10 +15,12 @@ from cetos.ais_adapter import guesstimate_vessel_data, guesstimate_voyage_data
 
 def _to_json_serializable(obj):
     """
-    Convert tuples to lists for JSON serialization compatibility.
+    Convert dataclasses and tuples to dicts/lists for JSON serialization compatibility.
     pytest-pinned stores results as JSON, which converts tuples to lists.
     """
-    if isinstance(obj, tuple):
+    if is_dataclass(obj) and not isinstance(obj, type):
+        return {key: _to_json_serializable(value) for key, value in asdict(obj).items()}
+    elif isinstance(obj, tuple):
         return [_to_json_serializable(item) for item in obj]
     elif isinstance(obj, list):
         return [_to_json_serializable(item) for item in obj]
@@ -62,9 +65,9 @@ def test_guesstimate_vessel_data_pinned(
     """
     Pin complete vessel data estimations from AIS data.
 
-    Captures the full vessel_data dictionary including:
-    - Vessel dimensions (length, beam, design_draft, design_speed)
-    - Propulsion system (engine power, type, fuel type, age, number of engines)
+    Captures the full vessel_data dataclass including:
+    - Vessel dimensions (length_m, beam_m, design_draft_m, design_speed_kn)
+    - Propulsion system (propulsion_engine_power_kw, propulsion_engine_type, propulsion_engine_fuel_type, propulsion_engine_age, number_of_propulsion_engines)
     - Vessel classification (type, size, double_ended)
 
     Tests various vessel types to ensure comprehensive coverage.
@@ -80,6 +83,8 @@ def test_guesstimate_vessel_data_pinned(
         latitude=lat,
         longitude=lon,
     )
+    # Convert dataclass to dict for JSON compatibility
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
@@ -118,11 +123,11 @@ def test_guesstimate_voyage_data_pinned(
     """
     Pin complete voyage data estimations from AIS waypoints.
 
-    Captures the full voyage_profile dictionary including:
-    - time_anchored
-    - time_at_berth
-    - legs_manoeuvring (list of tuples with distance, speed, draft)
-    - legs_at_sea (list of tuples with distance, speed, draft)
+    Captures the full voyage_profile dataclass including:
+    - time_anchored_h
+    - time_at_berth_h
+    - legs_manoeuvring (list of VoyageLeg with distance_nm, speed_kn, draft_m)
+    - legs_at_sea (list of VoyageLeg with distance_nm, speed_kn, draft_m)
 
     Tests various voyage scenarios including:
     - Short coastal trips
@@ -148,7 +153,7 @@ def test_guesstimate_voyage_data_pinned(
         design_speed,
         design_draft,
     )
-    # Convert tuples in legs_manoeuvring and legs_at_sea to lists for JSON compatibility
+    # Convert dataclass and tuples in legs_manoeuvring and legs_at_sea to dicts/lists for JSON compatibility
     result = _to_json_serializable(result)
     assert result == pinned
 
@@ -166,6 +171,7 @@ def test_guesstimate_vessel_data_minimum_dimensions_pinned(pinned):
         latitude=56.0,
         longitude=12.0,
     )
+    result = _to_json_serializable(result)
     assert result == pinned
 
 
@@ -182,6 +188,7 @@ def test_guesstimate_vessel_data_large_dimensions_pinned(pinned):
         latitude=57.0,
         longitude=11.0,
     )
+    result = _to_json_serializable(result)
     assert result == pinned
 
 

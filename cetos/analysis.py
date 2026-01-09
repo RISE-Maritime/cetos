@@ -4,6 +4,8 @@ from typing import List, Tuple
 import numpy as np
 from sklearn.cluster import DBSCAN, AgglomerativeClustering
 
+from cetos.models import VoyageLeg, VoyageProfile
+
 R = 6371000  # Earth's radius in meters
 
 
@@ -382,7 +384,7 @@ def make_voyage_profile(
     time_anchored=0.0,
     time_at_berth=0.0,
     speed_threshold=5.0,
-):
+) -> VoyageProfile:
     """Make a voyage profile
 
     Arguments:
@@ -410,22 +412,28 @@ def make_voyage_profile(
     Returns:
     --------
 
-        dict
-            Dictionary representing a voyage profile.
+        VoyageProfile
+            VoyageProfile instance representing a voyage profile.
 
     TODO: Implement criteria for 'manoeuvring' and 'at sea' in [1].
     """
 
-    voyage_profile = {
-        "time_anchored": time_anchored,
-        "time_at_berth": time_at_berth,
-        "legs_manoeuvring": [],
-        "legs_at_sea": [],
-    }
+    legs_manoeuvring = []
+    legs_at_sea = []
+
     for speed, distance in zip(leg_speeds, leg_distances):
-        key = "legs_manoeuvring" if speed < speed_threshold else "legs_at_sea"
-        voyage_profile[key].append((distance, speed, design_draft))
-    return voyage_profile
+        leg = VoyageLeg(distance_nm=distance, speed_kn=speed, draft_m=design_draft)
+        if speed < speed_threshold:
+            legs_manoeuvring.append(leg)
+        else:
+            legs_at_sea.append(leg)
+
+    return VoyageProfile(
+        time_anchored_h=time_anchored,
+        time_at_berth_h=time_at_berth,
+        legs_manoeuvring=legs_manoeuvring,
+        legs_at_sea=legs_at_sea,
+    )
 
 
 def calculate_total_fuel_consumption(ifc, timestamps):

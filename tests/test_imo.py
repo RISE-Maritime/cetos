@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from pytest import approx, raises
 
 from cetos.imo import (
@@ -7,33 +9,35 @@ from cetos.imo import (
     estimate_instantaneous_fuel_consumption_of_auxiliary_systems,
     estimate_propulsion_engine_load,
     estimate_specific_fuel_consumption,
-    verify_vessel_data,
-    verify_voyage_profile,
+)
+from cetos.models import VesselData, VoyageLeg, VoyageProfile
+
+DUMMY_VESSEL_DATA = VesselData(
+    design_speed_kn=10,
+    design_draft_m=7,
+    number_of_propulsion_engines=1,
+    propulsion_engine_power_kw=1_000,
+    propulsion_engine_type="MSD",
+    propulsion_engine_age="after_2000",
+    propulsion_engine_fuel_type="MDO",
+    type="offshore",
+    size=None,
+    double_ended=False,
+    length_m=100,
+    beam_m=20,
 )
 
-DUMMY_VESSEL_DATA = {
-    "design_speed": 10,  # kn
-    "design_draft": 7,  # m
-    "number_of_propulsion_engines": 1,
-    "propulsion_engine_power": 1_000,
-    "propulsion_engine_type": "MSD",
-    "propulsion_engine_age": "after_2000",
-    "propulsion_engine_fuel_type": "MDO",
-    "type": "offshore",
-    "size": None,
-    "double_ended": False,
-    "length": 100,
-    "beam": 20,
-}
-
-DUMMY_VOYAGE_PROFILE = {
-    "time_anchored": 10.0,  # time
-    "time_at_berth": 10.0,  # time
-    "legs_manoeuvring": [
-        (10, 10, 7),  # distance (nm), speed (kn), draft (m)
+DUMMY_VOYAGE_PROFILE = VoyageProfile(
+    time_anchored_h=10.0,
+    time_at_berth_h=10.0,
+    legs_manoeuvring=[
+        VoyageLeg(10, 10, 7),  # distance (nm), speed (kn), draft (m)
     ],
-    "legs_at_sea": [(10, 10, 7), (20, 10, 6)],  # distance (nm), speed (kn), draft (m)
-}
+    legs_at_sea=[
+        VoyageLeg(10, 10, 7),
+        VoyageLeg(20, 10, 6),
+    ],
+)
 
 
 def test_estimate_specific_fuel_consumption():
@@ -64,47 +68,12 @@ def test_estimate_specific_fuel_consumption():
     assert sfc_3 == sfc_2
 
 
-def test_verify_vessel_data():
-    vessel_data = DUMMY_VESSEL_DATA.copy()
-
-    # Correct data, no error raises
-    verify_vessel_data(vessel_data)
-
-    # Missing data
-    del vessel_data["design_speed"]
-    with raises(KeyError) as info:
-        verify_vessel_data(vessel_data)
-    assert "design_speed" in str(info)
-
-    # None value for size not Ok for some vessel types
-    # vessel_data = DUMMY_VESSEL_DATA.copy()
-    # vessel_data["type"] = "oil_tanker"
-    # with raises(ValueError) as info:
-    #    verify_vessel_data(vessel_data)
-    # assert "None" in str(info)
-
-    # Incorrect data
-    vessel_data = DUMMY_VESSEL_DATA.copy()
-    vessel_data["propulsion_engine_fuel_type"] = "blue"
-    with raises(ValueError) as info:
-        verify_vessel_data(vessel_data)
-    assert "propulsion_engine_fuel_type" in str(info)
-
-    vessel_data = DUMMY_VESSEL_DATA.copy()
-    vessel_data["propulsion_engine_type"] = "blue"
-    with raises(ValueError) as info:
-        verify_vessel_data(vessel_data)
-    assert "propulsion_engine_type" in str(info)
-
-
 def test_estimate_auxiliary_power_demand():
-    # Auxiliary power demand increases size
-    vessel_data = DUMMY_VESSEL_DATA.copy()
-    vessel_data["type"] = "oil_tanker"
-    vessel_data["size"] = 5_000
-    pd_1a, pd_1b = estimate_auxiliary_power_demand(vessel_data, "at_berth")
-    vessel_data["size"] = 20_000
-    pd_2a, pd_2b = estimate_auxiliary_power_demand(vessel_data, "at_berth")
+    # Auxiliary power demand increases with size
+    vessel_data_small = replace(DUMMY_VESSEL_DATA, type="oil_tanker", size=5_000)
+    pd_1a, pd_1b = estimate_auxiliary_power_demand(vessel_data_small, "at_berth")
+    vessel_data_large = replace(DUMMY_VESSEL_DATA, type="oil_tanker", size=20_000)
+    pd_2a, pd_2b = estimate_auxiliary_power_demand(vessel_data_large, "at_berth")
     assert pd_2a > pd_1a
     assert pd_2b > pd_1b
     assert pd_1a == 375
@@ -125,7 +94,7 @@ def test_estimate_propulsion_engine_load():
     # Speed must be between 0 kn and 110% the design speed
     with raises(ValueError) as info:
         estimate_propulsion_engine_load(
-            DUMMY_VESSEL_DATA["design_speed"] * 1.1 + 0.1, 7, DUMMY_VESSEL_DATA
+            DUMMY_VESSEL_DATA.design_speed_kn * 1.1 + 0.1, 7, DUMMY_VESSEL_DATA
         )
     assert "speed" in str(info)
     with raises(ValueError) as info:
@@ -135,12 +104,12 @@ def test_estimate_propulsion_engine_load():
     # Draft must be between 30% and 150% the design draft
     with raises(ValueError) as info:
         estimate_propulsion_engine_load(
-            6, 0.29 * DUMMY_VESSEL_DATA["design_draft"], DUMMY_VESSEL_DATA
+            6, 0.29 * DUMMY_VESSEL_DATA.design_draft_m, DUMMY_VESSEL_DATA
         )
     assert "draft" in str(info)
     with raises(ValueError) as info:
         estimate_propulsion_engine_load(
-            6, 1.51 * DUMMY_VESSEL_DATA["design_draft"], DUMMY_VESSEL_DATA
+            6, 1.51 * DUMMY_VESSEL_DATA.design_draft_m, DUMMY_VESSEL_DATA
         )
     assert "draft" in str(info)
 
@@ -163,23 +132,13 @@ def test_estimate_instantaneous_fuel_consumption_of_auxiliary_systems():
     assert ifc_boiler_2 == ifc_boiler_1
 
 
-def test_verify_voyage_profile():
-    # Raise error if missing key-value pairs
-    voyage_profile = DUMMY_VOYAGE_PROFILE.copy()
-    del voyage_profile["time_at_berth"]
-
-    with raises(KeyError) as info:
-        verify_voyage_profile(voyage_profile)
-    assert "time_at_berth" in str(info)
-
-
 def test_estimate_fuel_consumption():
-    vp0 = {
-        "time_at_berth": 0,
-        "time_anchored": 0,
-        "legs_manoeuvring": [],
-        "legs_at_sea": [],
-    }
+    vp0 = VoyageProfile(
+        time_at_berth_h=0,
+        time_anchored_h=0,
+        legs_manoeuvring=[],
+        legs_at_sea=[],
+    )
     fc_ = estimate_fuel_consumption(DUMMY_VESSEL_DATA, vp0)
     assert fc_["total_kg"] == 0
     assert max(fc_["at_berth"].values()) == 0
@@ -187,13 +146,19 @@ def test_estimate_fuel_consumption():
     assert max(fc_["manoeuvring"].values()) == 0
     assert max(fc_["at_sea"].values()) == 0
 
-    design_draft = DUMMY_VESSEL_DATA["design_draft"]
-    vp1 = {
-        "time_at_berth": 10,
-        "time_anchored": 10,
-        "legs_manoeuvring": [(10, 5, design_draft), (10, 10, design_draft)],
-        "legs_at_sea": [(5, 5, design_draft), (10, 10, design_draft)],
-    }
+    design_draft = DUMMY_VESSEL_DATA.design_draft_m
+    vp1 = VoyageProfile(
+        time_at_berth_h=10,
+        time_anchored_h=10,
+        legs_manoeuvring=[
+            VoyageLeg(10, 5, design_draft),
+            VoyageLeg(10, 10, design_draft),
+        ],
+        legs_at_sea=[
+            VoyageLeg(5, 5, design_draft),
+            VoyageLeg(10, 10, design_draft),
+        ],
+    )
 
     fc_ = estimate_fuel_consumption(DUMMY_VESSEL_DATA, vp1)
     assert fc_["total_kg"] != approx(0.0)

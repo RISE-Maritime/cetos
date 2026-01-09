@@ -30,34 +30,38 @@ pip install cetos
 
 ```python
 from cetos import imo
+from cetos.models import VesselData, VoyageLeg, VoyageProfile
 
 # Define vessel characteristics
-vessel_data = {
-    "length": 39.8,  # meters
-    "beam": 10.46,  # meters
-    "design_speed": 13.5,  # knots
-    "design_draft": 2.84,  # meters
-    "double_ended": False,
-    "number_of_propulsion_engines": 4,
-    "propulsion_engine_power": 330,  # kW per engine
-    "propulsion_engine_type": "MSD",
-    "propulsion_engine_age": "after_2000",
-    "propulsion_engine_fuel_type": "MDO",
-    "type": "ferry-pax",
-    "size": 686,  # GT
-}
+vessel_data = VesselData(
+    length_m=39.8,
+    beam_m=10.46,
+    design_speed_kn=13.5,
+    design_draft_m=2.84,
+    double_ended=False,
+    number_of_propulsion_engines=4,
+    propulsion_engine_power_kw=330,
+    propulsion_engine_type="MSD",
+    propulsion_engine_age="after_2000",
+    propulsion_engine_fuel_type="MDO",
+    type="ferry-pax",
+    size=686,  # GT
+)
 
-# Define voyage profile
-voyage_profile = {
-    "time_anchored": 10.0,  # hours
-    "time_at_berth": 10.0,  # hours
-    "legs_manoeuvring": [(10, 10, 6)],  # (distance, speed, draft)
-    "legs_at_sea": [(30, 10, 6), (30, 10, 6)],
-}
+# Define voyage profile with voyage legs
+voyage_profile = VoyageProfile(
+    time_anchored_h=10.0,
+    time_at_berth_h=10.0,
+    legs_manoeuvring=[VoyageLeg(distance_nm=10, speed_kn=10, draft_m=6)],
+    legs_at_sea=[
+        VoyageLeg(distance_nm=30, speed_kn=10, draft_m=6),
+        VoyageLeg(distance_nm=30, speed_kn=10, draft_m=6),
+    ],
+)
 
 # Calculate fuel consumption
-results = imo.calculate_fuel_consumption(vessel_data, voyage_profile)
-print(f"Total fuel consumption: {results['total_fuel']} tonnes")
+results = imo.estimate_fuel_consumption(vessel_data, voyage_profile)
+print(f"Total fuel consumption: {results['total_kg']} kg")
 ```
 
 ## Modules

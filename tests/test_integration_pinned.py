@@ -8,6 +8,7 @@ These tests capture complete pipelines combining multiple modules:
 They serve as comprehensive regression tests during refactoring.
 """
 
+from dataclasses import asdict, is_dataclass
 from datetime import datetime
 
 import pytest
@@ -18,14 +19,17 @@ from cetos.energy_systems import (
     suggest_alternative_energy_systems,
 )
 from cetos.imo import estimate_energy_consumption, estimate_fuel_consumption
+from cetos.models import VoyageLeg, VoyageProfile
 
 
 def _to_json_serializable(obj):
     """
-    Convert tuples to lists for JSON serialization compatibility.
+    Convert dataclasses and tuples to dicts/lists for JSON serialization compatibility.
     pytest-pinned stores results as JSON, which converts tuples to lists.
     """
-    if isinstance(obj, tuple):
+    if is_dataclass(obj) and not isinstance(obj, type):
+        return {key: _to_json_serializable(value) for key, value in asdict(obj).items()}
+    elif isinstance(obj, tuple):
         return [_to_json_serializable(item) for item in obj]
     elif isinstance(obj, list):
         return [_to_json_serializable(item) for item in obj]
@@ -80,12 +84,12 @@ def test_ais_to_vessel_data_to_fuel_consumption_pinned(
     )
 
     # Step 2: Create a simple voyage profile
-    voyage_profile = {
-        "time_anchored": 2.0,
-        "time_at_berth": 4.0,
-        "legs_manoeuvring": [(1, 5, vessel_data["design_draft"])],
-        "legs_at_sea": [(20, speed, vessel_data["design_draft"])],
-    }
+    voyage_profile = VoyageProfile(
+        time_anchored_h=2.0,
+        time_at_berth_h=4.0,
+        legs_manoeuvring=[VoyageLeg(1, 5, vessel_data.design_draft_m)],
+        legs_at_sea=[VoyageLeg(20, speed, vessel_data.design_draft_m)],
+    )
 
     # Step 3: Calculate fuel consumption
     result = estimate_fuel_consumption(vessel_data, voyage_profile)
@@ -134,8 +138,8 @@ def test_complete_ferry_workflow_pinned(pinned):
         speed_2=12,
         time_1=time1,
         time_2=time2,
-        design_speed=vessel_data["design_speed"],
-        design_draft=vessel_data["design_draft"],
+        design_speed=vessel_data.design_speed_kn,
+        design_draft=vessel_data.design_draft_m,
     )
 
     # Step 3: Calculate fuel consumption
@@ -161,7 +165,7 @@ def test_complete_ferry_workflow_pinned(pinned):
         "battery_system": battery_system,
     }
 
-    # Convert tuples to lists for JSON compatibility
+    # Convert dataclasses and tuples to dicts/lists for JSON compatibility
     result = _to_json_serializable(result)
     assert result == pinned
 
